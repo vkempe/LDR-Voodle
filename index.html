@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Voodle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5f1e8;
+    --paper-soft: #ebe5d6;
+    --ink: #1c1a17;
+    --ink-soft: #4a463f;
+    --rule: #d4cdb9;
+    --accent: #8b3a2a;
+    --accent-soft: #c97357;
+    --yes: #2f6b3a;
+    --maybe: #a06b1f;
+    --no: #8b2a2a;
+    --shadow: 0 1px 0 rgba(28, 26, 23, 0.06), 0 2px 8px rgba(28, 26, 23, 0.04);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(28,26,23,0.025) 1px, transparent 1px);
+    background-size: 3px 3px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+    position: relative;
+    z-index: 2;
+  }
+
+  header.masthead {
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 18px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 100, "wght" 900;
+    font-size: clamp(44px, 8vw, 72px);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .brand .v {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .gdpr {
+    background: var(--paper-soft);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin: 0 0 32px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  .gdpr strong {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  h2.section {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
+    line-height: 1.2;
+  }
+
+  .section-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    font-style: italic;
+  }
+
+  label.field {
+    display: block;
+    margin-bottom: 18px;
+  }
+
+  label.field > .lab {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  input[type="time"]:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(139, 58, 42, 0.12);
+  }
+
+  textarea { resize: vertical; min-height: 64px; }
+
+  .slot {
+    border: 1px solid var(--rule);
+    background: white;
+    border-radius: 2px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: border-color 0.15s ease;
+  }
+
+  .slot:hover { border-color: var(--ink-soft); }
+
+  .slot-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .slot-row .lab { margin-bottom: 4px; }
+
+  .slot-label-row {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: end;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    transition: all 0.15s ease;
+  }
+
+  .icon-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .icon-btn.danger:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .add-slot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px dashed var(--ink-soft);
+    border-radius: 2px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    transition: all 0.15s ease;
+  }
+
+  .add-slot:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    border-style: solid;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--accent); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .btn-secondary:hover { background: var(--ink); color: var(--paper); }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .poll-title {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "wght" 600;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .poll-desc {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    line-height: 1.6;
+  }
+
+  .vote-slot {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .vote-slot-when {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 24, "wght" 500;
+    font-size: 17px;
+    line-height: 1.3;
+  }
+
+  .vote-slot-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+
+  .pick-row {
+    display: flex;
+    gap: 4px;
+  }
+
+  .pick {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 8px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: all 0.12s ease;
+    min-width: 56px;
+  }
+
+  .pick:hover { border-color: var(--ink); color: var(--ink); }
+
+  .pick[aria-pressed="true"][data-val="yes"] {
+    background: var(--yes); color: white; border-color: var(--yes);
+  }
+  .pick[aria-pressed="true"][data-val="maybe"] {
+    background: var(--maybe); color: white; border-color: var(--maybe);
+  }
+  .pick[aria-pressed="true"][data-val="no"] {
+    background: var(--no); color: white; border-color: var(--no);
+  }
+
+  .link-out {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 14px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    word-break: break-all;
+    margin-top: 16px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 22px;
+    border-radius: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.error { background: var(--accent); }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-soft);
+  }
+  footer a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .thank-you {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .thank-you .mark {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "wght" 900;
+    font-size: 80px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .thank-you h2 {
+    font-family: 'Fraunces', serif;
+    font-variation-settings: "opsz" 144, "wght" 500;
+    font-size: 32px;
+    margin: 0 0 8px;
+  }
+
+  .thank-you p {
+    color: var(--ink-soft);
+    margin: 0 0 24px;
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 560px) {
+    .slot-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .slot-row > :nth-child(1) { grid-column: 1 / -1; }
+    .slot-label-row { grid-template-columns: 1fr auto; }
+    .vote-slot { grid-template-columns: 1fr; }
+    .pick-row { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1 class="brand"><span class="v">V</span>oodle</h1>
+    <p class="tagline">Vera's doodle &middot; no slot ceiling</p>
+  </header>
+
+  <!-- ADMIN / BUILDER VIEW -->
+  <section id="admin-view">
+
+    <h2 class="section">Build your poll</h2>
+    <p class="section-sub">Add as many slots as you need. Share the generated link with respondents.</p>
+
+    <label class="field">
+      <span class="lab">Title</span>
+      <input type="text" id="poll-title" placeholder="e.g. LDR editorial meeting, November 2026" />
+    </label>
+
+    <label class="field">
+      <span class="lab">Description (optional)</span>
+      <textarea id="poll-desc" placeholder="Anything participants should know before voting"></textarea>
+    </label>
+
+    <h2 class="section" style="margin-top: 28px;">Time slots</h2>
+    <p class="section-sub">Add one row per candidate slot. Drag to reorder by editing dates.</p>
+
+    <div id="slots-builder"></div>
+
+    <button class="add-slot" id="add-slot-btn">+ Add slot</button>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="copy-link-btn">Copy participant link</button>
+      <button class="btn btn-secondary" id="preview-btn">Preview as participant</button>
+      <button class="btn btn-secondary" id="clear-btn">Clear all</button>
+    </div>
+
+    <div id="link-display" class="link-out hidden"></div>
+
+  </section>
+
+  <!-- PARTICIPANT VIEW -->
+  <section id="vote-view" class="hidden">
+
+    <div class="gdpr">
+      <strong>GDPR notice</strong>
+      These time slot responses are being collected on behalf of <em>Language Development Research</em>. The information will be deleted as soon as a mutually agreeable meeting time has been found.
+    </div>
+
+    <h2 class="poll-title" id="vote-title"></h2>
+    <p class="poll-desc" id="vote-desc"></p>
+
+    <label class="field">
+      <span class="lab">Your name</span>
+      <input type="text" id="vote-name" placeholder="Required" autocomplete="name" />
+    </label>
+
+    <h2 class="section" style="margin-top: 28px;">Pick your availability</h2>
+    <p class="section-sub">Tap Yes, Maybe, or No for each slot.</p>
+
+    <div id="vote-slots"></div>
+
+    <label class="field" style="margin-top: 20px;">
+      <span class="lab">Comment (optional)</span>
+      <textarea id="vote-comment" placeholder="Anything to add"></textarea>
+    </label>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="submit-btn">Submit availability</button>
+      <button class="btn btn-secondary" id="back-to-admin" style="font-size: 10px;">Edit this poll</button>
+    </div>
+
+  </section>
+
+  <!-- THANK YOU VIEW -->
+  <section id="thanks-view" class="hidden">
+    <div class="thank-you">
+      <div class="mark">&#10003;</div>
+      <h2>Thank you</h2>
+      <p>Your availability has been recorded. You can close this window.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Voodle &middot; static, single-file, GDPR-conscious</span>
+    <a href="#" id="reset-link">New poll</a>
+  </footer>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // ============================================================
+  // CONFIG: paste your Google Apps Script web app URL below.
+  // The script must be deployed as a web app with execute-as-you
+  // and access set to "Anyone".
+  // ============================================================
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFQB4q4YhGqZNZCHbTQ3H1dW1oJHvlkHGZqMELQv86ovsKxuJi11KVNJCgOt12GZc2GQ/exec";
+
+  // ============================================================
+  // State
+  // ============================================================
+  const state = {
+    title: "",
+    description: "",
+    slots: []  // {id, date, start, end, label}
+  };
+
+  let participantPicks = {}; // slotId -> "yes"|"maybe"|"no"
+
+  // ============================================================
+  // Utilities
+  // ============================================================
+  function uid() {
+    return "s" + Math.random().toString(36).slice(2, 9);
+  }
+
+  function encodeConfig(cfg) {
+    const json = JSON.stringify(cfg);
+    // URL-safe base64
+    return btoa(unescape(encodeURIComponent(json)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function decodeConfig(str) {
+    try {
+      const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+      const json = decodeURIComponent(escape(atob(padded)));
+      return JSON.parse(json);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function formatDateNice(isoDate) {
+    if (!isoDate) return "";
+    const d = new Date(isoDate + "T00:00:00");
+    if (isNaN(d)) return isoDate;
+    const opts = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+    return d.toLocaleDateString("en-GB", opts);
+  }
+
+  function formatSlotDisplay(slot) {
+    const date = formatDateNice(slot.date);
+    let time = "";
+    if (slot.start && slot.end) time = ` &middot; ${slot.start} to ${slot.end}`;
+    else if (slot.start) time = ` &middot; ${slot.start}`;
+    return date + time;
+  }
+
+  function formatSlotPlain(slot) {
+    const date = formatDateNice(slot.date);
+    let time = "";
+    if (slot.start && slot.end) time = `, ${slot.start} to ${slot.end}`;
+    else if (slot.start) time = `, ${slot.start}`;
+    const label = slot.label ? ` (${slot.label})` : "";
+    return date + time + label;
+  }
+
+  function toast(msg, isError) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.toggle("error", !!isError);
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  // ============================================================
+  // Persistence (admin's last-edited poll, on her machine)
+  // ============================================================
+  const LS_KEY = "voodle_last_poll_v1";
+  function saveLocal() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+
+  // ============================================================
+  // Admin / builder rendering
+  // ============================================================
+  function renderBuilder() {
+    document.getElementById("poll-title").value = state.title;
+    document.getElementById("poll-desc").value = state.description;
+
+    const container = document.getElementById("slots-builder");
+    container.innerHTML = "";
+
+    state.slots.forEach((slot, i) => {
+      const div = document.createElement("div");
+      div.className = "slot";
+      div.innerHTML = `
+        <div class="slot-row">
+          <div>
+            <span class="lab">Date</span>
+            <input type="date" data-field="date" value="${slot.date || ''}" />
+          </div>
+          <div>
+            <span class="lab">Start</span>
+            <input type="time" data-field="start" value="${slot.start || ''}" />
+          </div>
+          <div>
+            <span class="lab">End</span>
+            <input type="time" data-field="end" value="${slot.end || ''}" />
+          </div>
+          <div>
+            <button class="icon-btn danger" data-action="delete" title="Remove slot">&times;</button>
+          </div>
+        </div>
+        <div class="slot-label-row">
+          <div style="flex:1;">
+            <span class="lab">Label (optional)</span>
+            <input type="text" data-field="label" value="${(slot.label || '').replace(/"/g, '&quot;')}" placeholder="e.g. Zoom, or Room 3.15" />
+          </div>
+          <button class="icon-btn" data-action="up" title="Move up" ${i === 0 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>&uarr;</button>
+          <button class="icon-btn" data-action="down" title="Move down" ${i === state.slots.length - 1 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>&darr;</button>
+        </div>
+      `;
+
+      div.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", e => {
+          const field = e.target.dataset.field;
+          slot[field] = e.target.value;
+          saveLocal();
+        });
+      });
+
+      div.querySelectorAll("[data-action]").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const action = e.target.dataset.action;
+          if (action === "delete") {
+            state.slots.splice(i, 1);
+          } else if (action === "up" && i > 0) {
+            [state.slots[i - 1], state.slots[i]] = [state.slots[i], state.slots[i - 1]];
+          } else if (action === "down" && i < state.slots.length - 1) {
+            [state.slots[i + 1], state.slots[i]] = [state.slots[i], state.slots[i + 1]];
+          }
+          saveLocal();
+          renderBuilder();
+        });
+      });
+
+      container.appendChild(div);
+    });
+  }
+
+  function addSlot() {
+    // Prefill date with last slot's date if available, else today
+    let defaultDate = new Date().toISOString().slice(0, 10);
+    if (state.slots.length) {
+      const last = state.slots[state.slots.length - 1];
+      if (last.date) defaultDate = last.date;
+    }
+    state.slots.push({
+      id: uid(),
+      date: defaultDate,
+      start: "10:00",
+      end: "11:00",
+      label: ""
+    });
+    saveLocal();
+    renderBuilder();
+  }
+
+  function buildShareLink() {
+    if (!state.title.trim()) {
+      toast("Add a title first", true);
+      return null;
+    }
+    if (!state.slots.length) {
+      toast("Add at least one slot", true);
+      return null;
+    }
+    const cfg = {
+      t: state.title,
+      d: state.description,
+      s: state.slots.map(s => ({
+        i: s.id, d: s.date, st: s.start, en: s.end, l: s.label
+      }))
+    };
+    const hash = encodeConfig(cfg);
+    const url = `${location.origin}${location.pathname}#${hash}`;
+    return url;
+  }
+
+  // ============================================================
+  // Participant rendering
+  // ============================================================
+  function loadFromHash() {
+    const hash = location.hash.slice(1);
+    if (!hash) return false;
+    const cfg = decodeConfig(hash);
+    if (!cfg || !cfg.s) return false;
+    state.title = cfg.t || "";
+    state.description = cfg.d || "";
+    state.slots = cfg.s.map(s => ({
+      id: s.i, date: s.d, start: s.st, end: s.en, label: s.l
+    }));
+    return true;
+  }
+
+  function renderVoteView() {
+    document.getElementById("vote-title").textContent = state.title;
+    const desc = document.getElementById("vote-desc");
+    if (state.description) {
+      desc.textContent = state.description;
+      desc.style.display = "";
+    } else {
+      desc.style.display = "none";
+    }
+
+    const container = document.getElementById("vote-slots");
+    container.innerHTML = "";
+
+    state.slots.forEach(slot => {
+      const div = document.createElement("div");
+      div.className = "vote-slot";
+      const labelHtml = slot.label ? `<div class="vote-slot-sub">${escapeHtml(slot.label)}</div>` : "";
+      div.innerHTML = `
+        <div>
+          <div class="vote-slot-when">${formatSlotDisplay(slot)}</div>
+          ${labelHtml}
+        </div>
+        <div class="pick-row" role="radiogroup">
+          <button class="pick" data-slot="${slot.id}" data-val="yes" aria-pressed="false">Yes</button>
+          <button class="pick" data-slot="${slot.id}" data-val="maybe" aria-pressed="false">Maybe</button>
+          <button class="pick" data-slot="${slot.id}" data-val="no" aria-pressed="false">No</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    container.querySelectorAll(".pick").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const slotId = btn.dataset.slot;
+        const val = btn.dataset.val;
+        participantPicks[slotId] = val;
+        // update visuals for this group
+        container.querySelectorAll(`.pick[data-slot="${slotId}"]`).forEach(b => {
+          b.setAttribute("aria-pressed", b.dataset.val === val ? "true" : "false");
+        });
+      });
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+  }
+
+  // ============================================================
+  // Submission
+  // ============================================================
+  async function submitVote() {
+    const name = document.getElementById("vote-name").value.trim();
+    if (!name) {
+      toast("Please enter your name", true);
+      return;
+    }
+
+    const missing = state.slots.filter(s => !participantPicks[s.id]);
+    if (missing.length) {
+      toast(`Please respond to all ${state.slots.length} slots`, true);
+      return;
+    }
+
+    const comment = document.getElementById("vote-comment").value.trim();
+
+    const payload = {
+      pollTitle: state.title,
+      name: name,
+      comment: comment,
+      submittedAt: new Date().toISOString(),
+      responses: state.slots.map(s => ({
+        slot: formatSlotPlain(s),
+        value: participantPicks[s.id]
+      }))
+    };
+
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Submitting…";
+
+    try {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("PASTE_YOUR")) {
+        throw new Error("Apps Script URL not configured");
+      }
+      // text/plain avoids CORS preflight against Apps Script
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      // With no-cors we can't read the response, so we trust success.
+      showThanks();
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = "Submit availability";
+      toast("Submission failed. Please try again.", true);
+      console.error(e);
+    }
+  }
+
+  function showThanks() {
+    document.getElementById("admin-view").classList.add("hidden");
+    document.getElementById("vote-view").classList.add("hidden");
+    document.getElementById("thanks-view").classList.remove("hidden");
+  }
+
+  // ============================================================
+  // View routing
+  // ============================================================
+  function showAdmin() {
+    document.getElementById("admin-view").classList.remove("hidden");
+    document.getElementById("vote-view").classList.add("hidden");
+    document.getElementById("thanks-view").classList.add("hidden");
+    renderBuilder();
+  }
+
+  function showVote() {
+    document.getElementById("admin-view").classList.add("hidden");
+    document.getElementById("vote-view").classList.remove("hidden");
+    document.getElementById("thanks-view").classList.add("hidden");
+    renderVoteView();
+  }
+
+  // ============================================================
+  // Event wiring
+  // ============================================================
+  document.getElementById("poll-title").addEventListener("input", e => {
+    state.title = e.target.value;
+    saveLocal();
+  });
+  document.getElementById("poll-desc").addEventListener("input", e => {
+    state.description = e.target.value;
+    saveLocal();
+  });
+  document.getElementById("add-slot-btn").addEventListener("click", addSlot);
+
+  document.getElementById("copy-link-btn").addEventListener("click", async () => {
+    const url = buildShareLink();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Link copied to clipboard");
+    } catch (e) {
+      toast("Copy failed, link shown below");
+    }
+    const disp = document.getElementById("link-display");
+    disp.textContent = url;
+    disp.classList.remove("hidden");
+  });
+
+  document.getElementById("preview-btn").addEventListener("click", () => {
+    const url = buildShareLink();
+    if (!url) return;
+    // Set hash so we can navigate back via "Edit this poll"
+    history.replaceState(null, "", url);
+    participantPicks = {};
+    showVote();
+  });
+
+  document.getElementById("clear-btn").addEventListener("click", () => {
+    if (!confirm("Clear the current poll and start fresh?")) return;
+    state.title = "";
+    state.description = "";
+    state.slots = [];
+    saveLocal();
+    history.replaceState(null, "", location.pathname);
+    renderBuilder();
+    document.getElementById("link-display").classList.add("hidden");
+  });
+
+  document.getElementById("submit-btn").addEventListener("click", submitVote);
+
+  document.getElementById("back-to-admin").addEventListener("click", () => {
+    showAdmin();
+  });
+
+  document.getElementById("reset-link").addEventListener("click", e => {
+    e.preventDefault();
+    history.replaceState(null, "", location.pathname);
+    location.reload();
+  });
+
+  // ============================================================
+  // Boot
+  // ============================================================
+  (function init() {
+    if (loadFromHash()) {
+      // Participant view (or admin previewing)
+      participantPicks = {};
+      showVote();
+    } else {
+      // Admin view, restore last poll if any
+      const saved = loadLocal();
+      if (saved) {
+        state.title = saved.title || "";
+        state.description = saved.description || "";
+        state.slots = saved.slots || [];
+      }
+      showAdmin();
+    }
+  })();
+</script>
+
+</body>
+</html>
